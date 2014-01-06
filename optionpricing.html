@@ -12,41 +12,75 @@
 			function main() {
 				if (document.getElementById('ecall').checked) {
 					document.SLOT.P.value = ecalloption(document.SLOT.S.value, document.SLOT.X.value, document.SLOT.T.value, document.SLOT.R.value, document.SLOT.V.value, document.SLOT.N.value);
+				} else if (document.getElementById('eput').checked) {
+					document.SLOT.P.value = eputoption(document.SLOT.S.value, document.SLOT.X.value, document.SLOT.T.value, document.SLOT.R.value, document.SLOT.V.value, document.SLOT.N.value);
 				}
 			}
 
-			//s=stock price, x=strike price, t=years to maturity, r=risk free rate, v=volatility, n=number of steps
+			//s=stock price, x=strike price, t=years to maturity, r=risk-free rate, v=volatility, n=number of steps
 			//calculates the value of a european call option
 			function ecalloption(s, x, t, r, v, n) { 
-				var rr = 0.000;
-				var u = 0.000;
-				var d = 0.000;
-				var p_up = 0.000;
-				var p_down = 0.000;
+				var u = 0.000; //volatility up
+				var d = 0.000; //volatility down
+				var p_up = 0.000; //probability of stock going up
+				var p_down = 0.000; //probability of stock going down
 				var df = 0.000; //discount factor 
+				var dt = 0.000; //time-step
 
-				var callValue = [];
+				var callValue = []; //initialize array of option values
 
-				rr = Math.exp((r/100)*(t/n));
-				u = 1+(v/100);
-				d = 1-(v/100);
-				p_up = (rr-d)/(u-d); //risk-neutral probability of up tick
+				dt = t/n; //one time-step
+				u = 1+(v/100)*Math.sqrt(dt);
+				d = 1-(v/100)*Math.sqrt(dt);
+				p_up = ((r/100)+(v/100))/(2*(v/100)); //risk-neutral probability of up tick
 				p_down = 1 - p_up;
-				df = 1/(1+rr); //discount factor
-
+				df = 1/(1+((r/100)*Math.sqrt(dt))); //discount factor over 1 time step
+				
 				var stock = 0.000;
 				for (var i = 0; i < n+1; i++) {
 					stock = s * Math.pow(u,i) * Math.pow(d,n-i);
 					callValue[i] = (stock > x) ? stock - x : 0;
 				}
 
-
+				//start from end of tree to get option price at each previous stage until we reach the initial option price
 				for (var j = n; j >= 0; j--) {
 					for (var i = 0; i < j; i++) {
 						callValue[i] = df*(p_up * callValue[i+1] + p_down * callValue[i]);
 					}
 				}
 				return callValue[0];
+			}
+
+			function eputoption(s, x, t, r, v, n) {
+				var u = 0.000; //volatility up
+				var d = 0.000; //volatility down
+				var p_up = 0.000; //probability of stock going up
+				var p_down = 0.000; //probability of stock going down
+				var df = 0.000; //discount factor 
+				var dt = 0.000; //time-step
+
+				var putValue = []; //initialize array of option values
+
+				dt = t/n; //one time-step
+				u = 1+(v/100)*Math.sqrt(dt);
+				d = 1-(v/100)*Math.sqrt(dt);
+				p_up = ((r/100)+(v/100))/(2*(v/100)); //risk-neutral probability of up tick
+				p_down = 1 - p_up;
+				df = 1/(1+((r/100)*Math.sqrt(dt))); //discount factor over 1 time step
+				
+				var stock = 0.000;
+				for (var i = 0; i < n+1; i++) {
+					stock = s * Math.pow(u,i) * Math.pow(d,n-i);
+					putValue[i] = (stock < x) ? x - stock : 0;
+				}
+
+				//start from end of tree to get option price at each previous stage until we reach the initial option price
+				for (var j = n; j >= 0; j--) {
+					for (var i = 0; i < j; i++) {
+						putValue[i] = df*(p_up * putValue[i+1] + p_down * putValue[i]);
+					}
+				}
+				return putValue[0];
 			}
 		</script>
 	</head>
