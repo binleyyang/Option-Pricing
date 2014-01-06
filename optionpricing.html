@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" 
+    "http://www.w3.org/TR/1998/REC-html40-19980424/loose.dtd">
+
+<html lang="en">
+	<head lang="en">
+		<meta charset="utf-8" name="keywords" content="binomial, tree, model, option, pricing, european, american, call, put"/>
+		<title>Binomial Tree Model - Option Pricing</title>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<script type="text/javascript">
+			var count = 0;
+
+			function main() {
+				if (document.getElementById('ecall').checked) {
+					document.SLOT.P.value = ecalloption(document.SLOT.S.value, document.SLOT.X.value, document.SLOT.T.value, document.SLOT.R.value, document.SLOT.V.value, document.SLOT.N.value);
+				}
+			}
+
+			//s=stock price, x=strike price, t=years to maturity, r=risk free rate, v=volatility, n=number of steps
+			//calculates the value of a european call option
+			function ecalloption(s, x, t, r, v, n) { 
+				var rr = 0.000;
+				var u = 0.000;
+				var d = 0.000;
+				var p_up = 0.000;
+				var p_down = 0.000;
+				var df = 0.000; //discount factor 
+
+				var callValue = [];
+
+				rr = Math.exp((r/100)*(t/n));
+				u = 1+(v/100);
+				d = 1-(v/100);
+				p_up = (rr-d)/(u-d); //risk-neutral probability of up tick
+				p_down = 1 - p_up;
+				df = 1/(1+rr); //discount factor
+
+				var stock = 0.000;
+				for (var i = 0; i < n+1; i++) {
+					stock = s * Math.pow(u,i) * Math.pow(d,n-i);
+					callValue[i] = (stock > x) ? stock - x : 0;
+				}
+
+
+				for (var j = n; j >= 0; j--) {
+					for (var i = 0; i < j; i++) {
+						callValue[i] = df*(p_up * callValue[i+1] + p_down * callValue[i]);
+					}
+				}
+				return callValue[0];
+			}
+		</script>
+	</head>
+
+	<body>
+		<div class="calculator">
+
+			<h1>Binomial Tree Model - Option Pricing</h1>
+
+			<form name="SLOT">
+				<table>
+					<thead>
+						<tr>
+							<th colspan="2">Input</th>
+							<th colspan="2">Result</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td class="no-border first"><input name="option" type="radio" id="eput">  European Put </td>
+							<td class="no-border"><input name="option" type="radio" id="ecall">  European Call </td>
+							<td class="no-border"><input name="option" type="radio" id="aput">  American Put </td>
+							<td class="no-border last"><input name="option" type="radio" id="acall">  American Call </td>
+						</tr>
+						<tr>
+							<td>Stock Price (S)</td>
+							<td><input name="S"> $</td>
+							<td rowspan="6">Option Price (P)</td>
+							<td rowspan="6"><input name="P"> $</td>
+						</tr>
+						<tr>
+							<td>Strike Price (X)</td>
+							<td><input name="X"> $</td>
+						</tr>
+						<tr>
+							<td>Years to Maturity (T)</td>
+							<td><input name="T"> Year(s)</td>
+						</tr>
+						<tr>
+							<td>Risk Free Rate (R)</td>
+							<td><input name="R"> %</td>
+						</tr>
+						<tr>
+							<td>Number of Steps (N)</td>
+							<td><input name="N"> Steps</td>
+						</tr>
+						<tr>
+							<td>Volatiliy (V)</td>
+							<td><input name="V"> %</td>
+						</tr>
+						<tr>
+							<td></td>
+							<td><input type="button" value="Calculate" onclick="main()"></td>
+						</tr>
+					</tbody>
+				</table>
+			</form>
+		</div>
+	</body>
+</html>
