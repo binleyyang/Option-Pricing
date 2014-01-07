@@ -14,6 +14,10 @@
 					document.SLOT.P.value = ecalloption(document.SLOT.S.value, document.SLOT.X.value, document.SLOT.T.value, document.SLOT.R.value, document.SLOT.V.value, document.SLOT.N.value);
 				} else if (document.getElementById('eput').checked) {
 					document.SLOT.P.value = eputoption(document.SLOT.S.value, document.SLOT.X.value, document.SLOT.T.value, document.SLOT.R.value, document.SLOT.V.value, document.SLOT.N.value);
+				} else if (document.getElementById('acall').checked) {
+					document.SLOT.P.value = acalloption(document.SLOT.S.value, document.SLOT.X.value, document.SLOT.T.value, document.SLOT.R.value, document.SLOT.V.value, document.SLOT.N.value);
+				} else if (document.getElementById('aput').checked) {
+					document.SLOT.P.value = aputoption(document.SLOT.S.value, document.SLOT.X.value, document.SLOT.T.value, document.SLOT.R.value, document.SLOT.V.value, document.SLOT.N.value);
 				}
 			}
 
@@ -82,6 +86,46 @@
 				}
 				return putValue[0];
 			}
+
+			function acalloption(s, x, t, r, v, n) {
+				var u = 0.000; 
+				var d = 0.000; 
+				var p_up = 0.000; 
+				var p_down = 0.000; 
+				var df = 0.000;  
+				var dt = 0.000; 
+
+				var callValue = [];
+				var price = [];
+
+				dt = t/n;
+				u = 1+(v/100)*Math.sqrt(dt);
+				d = 1-(v/100)*Math.sqrt(dt);
+				p_up = ((r/100)+(v/100))/(2*(v/100));
+				p_down = 1 - p_up;
+				df = 1/(1+((r/100)*Math.sqrt(dt))); 
+				
+				var stock = 0.000;
+				for (var i = 0; i < n+1; i++) {
+					stock = s * Math.pow(u,i) * Math.pow(d,n-i);
+					price[i] = stock; 		//store prices of stock at each step to later determine whether or not to exercise early
+					callValue[i] = (stock > x) ? stock - x : 0;
+				}
+
+				
+				for (var j = n; j >= 0; j--) {
+					for (var i = 0; i < j; i++) {
+						callValue[i] = df*(p_up * callValue[i+1] + p_down * callValue[i]);
+						price[i] = d*price[i+1];
+						callValue[i] = (callValue[i] > (price[i]-x)) ? callValue[i] : (price[i]-x);
+					}
+				}
+				return callValue[0];
+			}
+
+			function aputoption(s, x, t, r, v, n) {
+
+			}
 		</script>
 	</head>
 
@@ -94,22 +138,22 @@
 				<table>
 					<thead>
 						<tr>
-							<th colspan="2">Input</th>
-							<th colspan="2">Result</th>
+							<th colspan="1">Variables</th>
+							<th colspan="1">Result</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr>
-							<td class="no-border first"><input name="option" type="radio" id="eput">  European Put </td>
+							<td class="no-border"><input name="option" type="radio" id="eput">  European Put </td>
 							<td class="no-border"><input name="option" type="radio" id="ecall">  European Call </td>
-							<td class="no-border"><input name="option" type="radio" id="aput">  American Put </td>
-							<td class="no-border last"><input name="option" type="radio" id="acall">  American Call </td>
+						</tr>
+						<tr>
+							<td><input name="option" type="radio" id="aput">  American Put </td>
+							<td><input name="option" type="radio" id="acall">  American Call </td>
 						</tr>
 						<tr>
 							<td>Stock Price (S)</td>
 							<td><input name="S"> $</td>
-							<td rowspan="6">Option Price (P)</td>
-							<td rowspan="6"><input name="P"> $</td>
 						</tr>
 						<tr>
 							<td>Strike Price (X)</td>
@@ -132,8 +176,8 @@
 							<td><input name="V"> %</td>
 						</tr>
 						<tr>
-							<td></td>
-							<td><input type="button" value="Calculate" onclick="main()"></td>
+							<td colspan="1"><input type="button" value="Calculate" onclick="main()" id="calc"></td>
+							<td>Option Price: <input name="P"></td>
 						</tr>
 					</tbody>
 				</table>

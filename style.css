@@ -11,25 +11,23 @@
 
 table {
 	border-collapse: collapse;
-	width: 960px;
+	width: 480px;
 	margin: 0 auto;
 }
 
 td, th {
 	width: 170px;
 	border: 1px solid #ddd;
-	padding: .5rem;
+	padding: .75rem;
 }
 
 td.no-border {
-	border: none;
+	border-bottom: none;
 }
 
-td.first {
-	border-left: 1px solid #ddd;
-}
-
-td.last {
-	border-right: 1px solid #ddd;
+input#calc {
+	width: 100px;
+	font-size: 24px;
+	margin-left: 60px;
 }
 
