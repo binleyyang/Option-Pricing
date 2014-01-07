@@ -7,124 +7,72 @@
 		<title>Binomial Tree Model - Option Pricing</title>
 		<link rel="stylesheet" type="text/css" href="style.css">
 		<script type="text/javascript">
-			var count = 0;
 
 			function main() {
-				if (document.getElementById('ecall').checked) {
-					document.SLOT.P.value = ecalloption(document.SLOT.S.value, document.SLOT.X.value, document.SLOT.T.value, document.SLOT.R.value, document.SLOT.V.value, document.SLOT.N.value);
-				} else if (document.getElementById('eput').checked) {
-					document.SLOT.P.value = eputoption(document.SLOT.S.value, document.SLOT.X.value, document.SLOT.T.value, document.SLOT.R.value, document.SLOT.V.value, document.SLOT.N.value);
-				} else if (document.getElementById('acall').checked) {
-					document.SLOT.P.value = acalloption(document.SLOT.S.value, document.SLOT.X.value, document.SLOT.T.value, document.SLOT.R.value, document.SLOT.V.value, document.SLOT.N.value);
-				} else if (document.getElementById('aput').checked) {
-					document.SLOT.P.value = aputoption(document.SLOT.S.value, document.SLOT.X.value, document.SLOT.T.value, document.SLOT.R.value, document.SLOT.V.value, document.SLOT.N.value);
-				}
+				var str;
+				if (document.getElementById('ecall').checked)
+					str = "ecall";
+				else if (document.getElementById('eput').checked)
+					str = "eput";
+				else if (document.getElementById('acall').checked)
+					str = "acall";
+				else if (document.getElementById('aput').checked)
+					str = "aput";
+
+				document.SLOT.P.value = calc_Price(document.SLOT.S.value, document.SLOT.X.value, document.SLOT.T.value, document.SLOT.R.value, document.SLOT.V.value, document.SLOT.N.value, str);
+
 			}
 
 			//s=stock price, x=strike price, t=years to maturity, r=risk-free rate, v=volatility, n=number of steps
-			//calculates the value of a european call option
-			function ecalloption(s, x, t, r, v, n) { 
+			//calculates the value of an option
+
+			function calc_Price(s, x, t, r, v, n, name) {
 				var u = 0.000; //volatility up
 				var d = 0.000; //volatility down
 				var p_up = 0.000; //probability of stock going up
 				var p_down = 0.000; //probability of stock going down
 				var df = 0.000; //discount factor 
 				var dt = 0.000; //time-step
+				var type = name; //type of option selected
 
-				var callValue = []; //initialize array of option values
-
-				dt = t/n; //one time-step
-				u = 1+(v/100)*Math.sqrt(dt);
-				d = 1-(v/100)*Math.sqrt(dt);
-				p_up = ((r/100)+(v/100))/(2*(v/100)); //risk-neutral probability of up tick
-				p_down = 1 - p_up;
-				df = 1/(1+((r/100)*Math.sqrt(dt))); //discount factor over 1 time step
-				
-				var stock = 0.000;
-				for (var i = 0; i < n+1; i++) {
-					stock = s * Math.pow(u,i) * Math.pow(d,n-i);
-					callValue[i] = (stock > x) ? stock - x : 0;
-				}
-
-				//start from end of tree to get option price at each previous stage until we reach the initial option price
-				for (var j = n; j >= 0; j--) {
-					for (var i = 0; i < j; i++) {
-						callValue[i] = df*(p_up * callValue[i+1] + p_down * callValue[i]);
-					}
-				}
-				return callValue[0];
-			}
-
-			function eputoption(s, x, t, r, v, n) {
-				var u = 0.000; //volatility up
-				var d = 0.000; //volatility down
-				var p_up = 0.000; //probability of stock going up
-				var p_down = 0.000; //probability of stock going down
-				var df = 0.000; //discount factor 
-				var dt = 0.000; //time-step
-
-				var putValue = []; //initialize array of option values
+				var option = []; //initialize array of option values
+				var price = []; //initailize array of stock prices
 
 				dt = t/n; //one time-step
 				u = 1+(v/100)*Math.sqrt(dt);
 				d = 1-(v/100)*Math.sqrt(dt);
 				p_up = ((r/100)+(v/100))/(2*(v/100)); //risk-neutral probability of up tick
-				p_down = 1 - p_up;
+				p_down = 1 - p_up;                    //risk-neutral probability of down tick
 				df = 1/(1+((r/100)*Math.sqrt(dt))); //discount factor over 1 time step
 				
 				var stock = 0.000;
 				for (var i = 0; i < n+1; i++) {
 					stock = s * Math.pow(u,i) * Math.pow(d,n-i);
-					putValue[i] = (stock < x) ? x - stock : 0;
+					price[i] = stock;
+					if (type == "ecall" || type == "acall")
+						option[i] = (stock > x) ? stock - x : 0; 
+					else if (type == "eput" || type == "aput")
+						option[i] = (stock < x) ? x - stock : 0;
 				}
 
 				//start from end of tree to get option price at each previous stage until we reach the initial option price
 				for (var j = n; j >= 0; j--) {
 					for (var i = 0; i < j; i++) {
-						putValue[i] = df*(p_up * putValue[i+1] + p_down * putValue[i]);
-					}
-				}
-				return putValue[0];
-			}
-
-			function acalloption(s, x, t, r, v, n) {
-				var u = 0.000; 
-				var d = 0.000; 
-				var p_up = 0.000; 
-				var p_down = 0.000; 
-				var df = 0.000;  
-				var dt = 0.000; 
-
-				var callValue = [];
-				var price = [];
-
-				dt = t/n;
-				u = 1+(v/100)*Math.sqrt(dt);
-				d = 1-(v/100)*Math.sqrt(dt);
-				p_up = ((r/100)+(v/100))/(2*(v/100));
-				p_down = 1 - p_up;
-				df = 1/(1+((r/100)*Math.sqrt(dt))); 
-				
-				var stock = 0.000;
-				for (var i = 0; i < n+1; i++) {
-					stock = s * Math.pow(u,i) * Math.pow(d,n-i);
-					price[i] = stock; 		//store prices of stock at each step to later determine whether or not to exercise early
-					callValue[i] = (stock > x) ? stock - x : 0;
-				}
-
-				
-				for (var j = n; j >= 0; j--) {
-					for (var i = 0; i < j; i++) {
-						callValue[i] = df*(p_up * callValue[i+1] + p_down * callValue[i]);
 						price[i] = d*price[i+1];
-						callValue[i] = (callValue[i] > (price[i]-x)) ? callValue[i] : (price[i]-x);
+						if (type == "ecall" || type == "eput") //calculates european call or put option price
+							option[i] = df*(p_up * option[i+1] + p_down * option[i]);
+						else if (type == "acall") { //calculates american call option price
+							option[i] = df*(p_up * option[i+1] + p_down * option[i]);
+							option[i] = (option[i] > (price[i]-x)) ? option[i] : (price[i]-x);
+						}
+						else if (type == "aput") { //calculates american put option price
+							option[i] = df*(p_up * option[i+1] + p_down * option[i]);
+							option[i] = (option[i] > (x-price[i])) ? option[i] : (x-price[i]);
+						}
+
 					}
 				}
-				return callValue[0];
-			}
-
-			function aputoption(s, x, t, r, v, n) {
-
+				return option[0];
 			}
 		</script>
 	</head>
@@ -139,17 +87,17 @@
 					<thead>
 						<tr>
 							<th colspan="1">Variables</th>
-							<th colspan="1">Result</th>
+							<th colspan="1">Input</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr>
-							<td class="no-border"><input name="option" type="radio" id="eput">  European Put </td>
-							<td class="no-border"><input name="option" type="radio" id="ecall">  European Call </td>
+							<td class="no-border"><input name="option" type="radio" id="eput" class="radio_but">  European Put </td>
+							<td class="no-border"><input name="option" type="radio" id="ecall" class="radio_but">  European Call </td>
 						</tr>
 						<tr>
-							<td><input name="option" type="radio" id="aput">  American Put </td>
-							<td><input name="option" type="radio" id="acall">  American Call </td>
+							<td><input name="option" type="radio" id="aput" class="radio_but">  American Put </td>
+							<td><input name="option" type="radio" id="acall" class="radio_but">  American Call </td>
 						</tr>
 						<tr>
 							<td>Stock Price (S)</td>
