@@ -4,7 +4,7 @@
 <html lang="en">
 	<head lang="en">
 		<meta charset="utf-8" name="keywords" content="binomial, tree, model, option, pricing, european, american, call, put"/>
-		<title>Binomial Tree Model - Option Pricing</title>
+		<title>Binomial Model - Option Pricing</title>
 		<link rel="stylesheet" type="text/css" href="style.css">
 		<script type="text/javascript">
 
@@ -25,7 +25,6 @@
 
 			//s=stock price, x=strike price, t=years to maturity, r=risk-free rate, v=volatility, n=number of steps
 			//calculates the value of an option
-
 			function calc_Price(s, x, t, r, v, n, name) {
 				var u = 0.000; //volatility up
 				var d = 0.000; //volatility down
@@ -80,24 +79,24 @@
 	<body>
 		<div class="calculator">
 
-			<h1>Binomial Tree Model - Option Pricing</h1>
+			<h1>Option Pricing: Binomial Model</h1>
+
+			<div class="option-type">
+				<input name="option" type="radio" id="eput" class="radio_but"> European Put  
+				<input name="option" type="radio" id="ecall" class="radio_but"> European Call  
+				<input name="option" type="radio" id="aput" class="radio_but"> American Put  
+				<input name="option" type="radio" id="acall" class="radio_but"> American Call 
+			</div>
 
 			<form name="SLOT">
 				<table>
 					<thead>
-						<tr>
-							<th colspan="1">Variables</th>
-							<th colspan="1">Input</th>
-						</tr>
+						
 					</thead>
 					<tbody>
 						<tr>
-							<td class="no-border"><input name="option" type="radio" id="eput" class="radio_but">  European Put </td>
-							<td class="no-border"><input name="option" type="radio" id="ecall" class="radio_but">  European Call </td>
-						</tr>
-						<tr>
-							<td><input name="option" type="radio" id="aput" class="radio_but">  American Put </td>
-							<td><input name="option" type="radio" id="acall" class="radio_but">  American Call </td>
+							<th colspan="1">Variables</th>
+							<th colspan="1">Input</th>
 						</tr>
 						<tr>
 							<td>Stock Price (S)</td>
@@ -130,6 +129,10 @@
 					</tbody>
 				</table>
 			</form>
+		</div>
+
+		<div class="footer">
+			<p>Developed by Binley Yang.<br> Contact me at binleyyang@gmail.com for questions and/or comments</p>
 		</div>
 	</body>
 </html>

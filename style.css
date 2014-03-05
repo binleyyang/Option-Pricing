@@ -1,5 +1,10 @@
 * {margin: 0; padding: 0;}
 
+body {
+	width: 100%;
+	background-color: #D9FAF7;
+}
+
 .calculator {
 	width: 960px;
 	margin: 0 auto;
@@ -7,12 +12,25 @@
 
 .calculator h1 {
 	text-align: center;
+	margin-top: 36px;
+	margin-bottom: 36px;
+}
+
+.option-type {
+	width: 480px;
+	margin: 0 auto;
+	margin-bottom: 10px;
+}
+
+input[type=radio]{
+	margin-left: 10px;
 }
 
 table {
 	border-collapse: collapse;
 	width: 480px;
 	margin: 0 auto;
+	background-color: #fff;
 }
 
 td, th {
@@ -22,7 +40,7 @@ td, th {
 }
 
 td.no-border {
-	border-bottom: none;
+	border: none;
 }
 
 input#calc {
@@ -31,3 +49,11 @@ input#calc {
 	margin-left: 60px;
 }
 
+.footer {
+	left: 0;
+	right: 0;
+	text-align: center;
+	position: absolute;
+	bottom: 0;
+	padding-bottom: 10px;
+}
